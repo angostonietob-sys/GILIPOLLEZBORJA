@@ -1,384 +1,176 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
-    <meta charset="UTF-8">
-    <title>Bocina Personalizada</title>
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: Arial, sans-serif;
-        }
-
-        body {
-            background: #111;
-            color: #fff;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            text-align: center;
-            padding: 20px;
-            gap: 15px;
-        }
-
-        h1 {
-            font-size: 1.8rem;
-        }
-
-        .panel {
-            background: #222;
-            padding: 15px;
-            border-radius: 12px;
-            width: 100%;
-            max-width: 420px;
-            border: 1px solid #333;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        button {
-            padding: 12px;
-            font-size: 1rem;
-            font-weight: bold;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-
-        .btn-micro {
-            background: #0288d1;
-            color: white;
-        }
-
-        .btn-micro.activo {
-            background: #2e7d32;
-        }
-
-        .btn-grabar {
-            background: #e65100;
-            color: white;
-        }
-
-        .btn-grabar.grabando {
-            background: #b71c1c;
-            animation: parpadeo 0.8s infinite;
-        }
-
-        .btn-descargar {
-            background: #2e7d32;
-            color: white;
-            display: none;
-        }
-
-        @keyframes parpadeo {
-            0% {
-                opacity: 1;
-            }
-
-            50% {
-                opacity: 0.5;
-            }
-
-            100% {
-                opacity: 1;
-            }
-        }
-
-        .btn-pito {
-            width: 220px;
-            height: 220px;
-            border-radius: 50%;
-            background: #d32f2f;
-            color: #fff;
-            font-size: 1.8rem;
-            font-weight: bold;
-            border: 5px solid #fff;
-            cursor: pointer;
-            box-shadow: 0 0 30px rgba(211, 47, 47, 0.7);
-            margin: 15px 0;
-        }
-
-        .btn-pito:active {
-            transform: scale(0.95);
-        }
-
-        input[type="file"] {
-            display: none;
-        }
-
-        .label-file {
-            background: #444;
-            padding: 10px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            display: block;
-        }
-
-        #estado {
-            color: #ffb703;
-            font-weight: bold;
-            min-height: 22px;
-        }
-
-        #sonido-actual {
-            font-size: 0.85rem;
-            color: #00e676;
-            font-weight: bold;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bocina Silla</title>
+  <style>
+    body {
+      margin: 0;
+      background: #111;
+      color: #fff;
+      font-family: sans-serif;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      text-align: center;
+      justify-content: space-between;
+      padding: 12px;
+      box-sizing: border-box;
+    }
+    #estado {
+      font-size: 1.1rem;
+      padding: 10px;
+      background: #222;
+      border-radius: 8px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      flex-grow: 1;
+      margin: 10px 0;
+    }
+    button {
+      font-size: 1.3rem;
+      font-weight: bold;
+      border: none;
+      border-radius: 12px;
+      color: white;
+      touch-action: manipulation;
+    }
+    #btn-pito { background: #007acc; }
+    #btn-bocina { background: #e65100; }
+    #btn-camaro { background: #fbc02d; color: #111; }
+    #btn-frase { background: #7b1fa2; }
+    
+    .panel-control {
+      display: flex;
+      gap: 10px;
+      height: 60px;
+    }
+    #btn-parar {
+      background: #d32f2f;
+      flex: 2;
+    }
+    #btn-pantalla {
+      background: #333;
+      flex: 1;
+      font-size: 0.9rem;
+    }
+    .negro {
+      background: #000 !important;
+      color: #000 !important;
+    }
+    .negro .grid, .negro #estado, .negro .panel-control {
+      visibility: hidden;
+    }
+  </style>
 </head>
-
 <body>
 
-    <h1>BOCINA POR VOZ</h1>
+  <div id="estado">Toca la pantalla para activar</div>
 
-    <div id="estado">Iniciando sistema...</div>
+  <div class="grid">
+    <button id="btn-pito" onclick="sonar('pito')">PITA<br><small>(Pitido)</small></button>
+    <button id="btn-bocina" onclick="sonar('bocina')">BOCINA<br><small>(Bocina)</small></button>
+    <button id="btn-camaro" onclick="sonar('camaro')">MOTOR<br><small>(Deportivo)</small></button>
+    <button id="btn-frase" onclick="sonar('frase')">QUITA<br><small>(De una puta vez)</small></button>
+  </div>
 
-    <!-- BOTÓN CLAXON -->
-    <button class="btn-pito" id="btnPito" onclick="sonarBocina()">¡SOLTAR PITO!</button>
+  <div class="panel-control">
+    <button id="btn-parar" onclick="pararTodo()">⏹️ PARAR TODO</button>
+    <button id="btn-pantalla" onclick="pantallaNegra()">Pantalla Negra</button>
+  </div>
 
-    <button class="btn-micro" id="btnMicro">🎙️ Activar Escucha por Voz</button>
+  <!-- Tus audios webm de la carpeta -->
+  <audio id="snd-pito" src="pitido.webm" preload="auto"></audio>
+  <audio id="snd-bocina" src="bocina.webm" preload="auto"></audio>
+  <audio id="snd-camaro" src="deportivo.webm" preload="auto"></audio>
+  <audio id="snd-frase" src="de una puta vez.webm" preload="auto"></audio>
 
-    <!-- PANEL DE CONFIGURACIÓN -->
-    <div class="panel">
-        <strong>Personalizar audio:</strong>
+  <script>
+    const estado = document.getElementById('estado');
+    const audios = document.querySelectorAll('audio');
+    let microActivo = false;
+    let micro = null;
 
-        <!-- Opción 1: Subir archivo -->
-        <label class="label-file">
-            📁 Cargar audio desde PC (MP3 / WAV / WebM)
-            <input type="file" id="inputAudio" accept="audio/*">
-        </label>
+    function pararTodo() {
+      audios.forEach(a => {
+        a.pause();
+        a.currentTime = 0;
+      });
+      microActivo = false;
+      if (micro) {
+        try { micro.stop(); } catch(e) {}
+      }
+      estado.innerText = "🛑 DETENIDO (Toca la pantalla para reanudar)";
+    }
 
-        <!-- Opción 2: Grabar con micro -->
-        <button class="btn-grabar" id="btnGrabar">🔴 Grabar mi propio sonido</button>
-        <button class="btn-descargar" id="btnDescargar">💾 Descargar audio al PC</button>
+    function sonar(id) {
+      audios.forEach(a => {
+        a.pause();
+        a.currentTime = 0;
+      });
+      const audio = document.getElementById('snd-' + id);
+      if (audio) {
+        audio.play().catch(e => console.log('Error de audio:', e));
+      }
+    }
 
-        <div id="sonido-actual">Sonido cargado: Ninguno</div>
-    </div>
+    const Reconocimiento = window.SpeechRecognition || window.webkitSpeechRecognition;
 
-    <script>
-        let audioCtx = null;
-        let bufferSonido = null;
-        let mediaRecorder = null;
-        let chunksAudio = [];
-        let audioBlobGuardado = null;
+    if (!Reconocimiento) {
+      estado.innerText = "Navegador sin soporte de voz (usa Chrome)";
+    } else {
+      micro = new Reconocimiento();
+      micro.lang = 'es-ES';
+      micro.continuous = true;
+      micro.interimResults = true;
 
-        function getAudioContext() {
-            if (!audioCtx) {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            }
-            if (audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
-            return audioCtx;
+      micro.onresult = (evento) => {
+        for (let i = evento.resultIndex; i < evento.results.length; ++i) {
+          const texto = evento.results[i][0].transcript.toLowerCase();
+          estado.innerText = "Escuchado: " + texto;
+
+          if (texto.includes('para') || texto.includes('stop') || texto.includes('silencio')) {
+            pararTodo();
+            return;
+          }
+
+          if (texto.includes('pita') || texto.includes('pitido') || texto.includes('paso')) {
+            sonar('pito');
+          } else if (texto.includes('bocina') || texto.includes('sirena')) {
+            sonar('bocina');
+          } else if (texto.includes('motor') || texto.includes('deportivo') || texto.includes('camaro')) {
+            sonar('camaro');
+          } else if (texto.includes('quita') || texto.includes('fuera') || texto.includes('cojones')) {
+            sonar('frase');
+          }
         }
+      };
 
-        // BASE DE DATOS LOCAL (IndexedDB) para que no se pierda al cerrar
-        function abrirDB() {
-            return new Promise((resolve, reject) => {
-                const req = indexedDB.open("BocinaDB", 1);
-                req.onupgradeneeded = () => req.result.createObjectStore("audios");
-                req.onsuccess = () => resolve(req.result);
-                req.onerror = () => reject(req.error);
-            });
+      micro.onend = () => {
+        if (microActivo) {
+          try { micro.start(); } catch(e) {}
         }
+      };
 
-        async function guardarAudioLocal(blob, nombre) {
-            try {
-                const db = await abrirDB();
-                const tx = db.transaction("audios", "readwrite");
-                tx.objectStore("audios").put({ blob, nombre }, "audioActual");
-            } catch (e) {
-                console.error("Error guardando localmente:", e);
-            }
+      window.addEventListener('click', (e) => {
+        if (e.target.id === 'btn-parar') return;
+        if (!microActivo) {
+          microActivo = true;
+          try {
+            micro.start();
+            estado.innerText = "🎤 Micro activo y escuchando...";
+          } catch(e) {}
         }
+      });
+    }
 
-        async function cargarAudioLocal() {
-            try {
-                const db = await abrirDB();
-                const tx = db.transaction("audios", "readonly");
-                const req = tx.objectStore("audios").get("audioActual");
-                req.onsuccess = async () => {
-                    if (req.result && req.result.blob) {
-                        audioBlobGuardado = req.result.blob;
-                        const arrayBuffer = await req.result.blob.arrayBuffer();
-                        const ctx = getAudioContext();
-                        bufferSonido = await ctx.decodeAudioData(arrayBuffer);
-                        document.getElementById('sonido-actual').innerText = "Sonido cargado: " + req.result.nombre;
-                        document.getElementById('estado').innerText = "Audio recuperado y listo.";
-                        document.getElementById('btnDescargar').style.display = 'block';
-                    } else {
-                        document.getElementById('estado').innerText = "Graba un audio o sube un archivo.";
-                    }
-                };
-            } catch (e) {
-                console.error("Error cargando de BD:", e);
-            }
-        }
-
-        // Cargar sonido guardado al arrancar
-        window.addEventListener('DOMContentLoaded', cargarAudioLocal);
-
-        // REPRODUCCIÓN A MÁXIMO VOLUMEN (Modo graves potentes)
-        function sonarBocina() {
-            const ctx = getAudioContext();
-            if (!bufferSonido) {
-                alert("Primero graba un sonido o sube un archivo.");
-                return;
-            }
-
-            const fuente = ctx.createBufferSource();
-            fuente.buffer = bufferSonido;
-
-            // Ganancia multiplicada x5 para romper límite
-            const gainNode = ctx.createGain();
-            gainNode.gain.value = 5.0;
-
-            // Compresor dinámico para exprimir al máximo el cono de graves sin romper
-            const compresor = ctx.createDynamicsCompressor();
-            compresor.threshold.setValueAtTime(-6, ctx.currentTime);
-            compresor.ratio.setValueAtTime(20, ctx.currentTime);
-
-            fuente.connect(gainNode);
-            gainNode.connect(compresor);
-            compresor.connect(ctx.destination);
-
-            fuente.start(0);
-        }
-
-        // CARGAR ARCHIVO DESDE EL PC
-        document.getElementById('inputAudio').addEventListener('change', function (e) {
-            const archivo = e.target.files[0];
-            if (!archivo) return;
-
-            const reader = new FileReader();
-            reader.onload = async function (ev) {
-                const ctx = getAudioContext();
-                bufferSonido = await ctx.decodeAudioData(ev.target.result.slice(0));
-                audioBlobGuardado = archivo;
-                guardarAudioLocal(archivo, archivo.name);
-                document.getElementById('sonido-actual').innerText = "Sonido cargado: " + archivo.name;
-                document.getElementById('estado').innerText = "✅ Archivo cargado y guardado";
-                document.getElementById('btnDescargar').style.display = 'block';
-            };
-            reader.readAsArrayBuffer(archivo);
-        });
-
-        // GRABAR AUDIO PROPIO CON EL MICRÓFONO
-        const btnGrabar = document.getElementById('btnGrabar');
-        const btnDescargar = document.getElementById('btnDescargar');
-        let grabando = false;
-
-        btnGrabar.addEventListener('click', async () => {
-            getAudioContext();
-            if (!grabando) {
-                try {
-                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                    mediaRecorder = new MediaRecorder(stream);
-                    chunksAudio = [];
-
-                    mediaRecorder.ondataavailable = e => chunksAudio.push(e.data);
-                    mediaRecorder.onstop = async () => {
-                        const blob = new Blob(chunksAudio, { type: 'audio/webm' });
-                        audioBlobGuardado = blob;
-
-                        const arrayBuffer = await blob.arrayBuffer();
-                        const ctx = getAudioContext();
-                        bufferSonido = await ctx.decodeAudioData(arrayBuffer);
-
-                        guardarAudioLocal(blob, "Grabación: ¡Quitar del medio!");
-
-                        document.getElementById('sonido-actual').innerText = "Sonido cargado: ¡Grabación propia!";
-                        document.getElementById('estado').innerText = "✅ Audio guardado en navegador";
-                        btnDescargar.style.display = 'block';
-                    };
-
-                    mediaRecorder.start();
-                    grabando = true;
-                    btnGrabar.innerText = "⏹️ Parar Grabación";
-                    btnGrabar.classList.add('grabando');
-                    document.getElementById('estado').innerText = "Grabando... ¡Suelta la frase con fuerza!";
-                } catch (err) {
-                    alert("No se pudo acceder al micrófono para grabar.");
-                }
-            } else {
-                mediaRecorder.stop();
-                grabando = false;
-                btnGrabar.innerText = "🔴 Grabar mi propio sonido";
-                btnGrabar.classList.remove('grabando');
-            }
-        });
-
-        // BOTÓN DESCARGAR AUDIO AL PC
-        btnDescargar.addEventListener('click', () => {
-            if (!audioBlobGuardado) return;
-            const url = URL.createObjectURL(audioBlobGuardado);
-            const a = document.createElement('a');
-            a.style.display = 'none';
-            a.href = url;
-            a.download = 'quitar_del_medio.webm';
-            document.body.appendChild(a);
-            a.click();
-            window.URL.revokeObjectURL(url);
-        });
-
-        // RECONOCIMIENTO DE VOZ PARA ACTIVACIÓN
-        const btnMicro = document.getElementById('btnMicro');
-        const estado = document.getElementById('estado');
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-
-        if (SpeechRecognition) {
-            const recognition = new SpeechRecognition();
-            recognition.lang = 'es-ES';
-            recognition.continuous = true;
-            let escuchando = false;
-
-            recognition.onstart = () => {
-                escuchando = true;
-                btnMicro.innerText = "🟢 Escuchando (Di: PASO o PITA)";
-                btnMicro.classList.add('activo');
-                estado.innerText = "Atento: di 'PASO', 'PITA' o 'CUIDADO'";
-            };
-
-            recognition.onresult = (event) => {
-                const texto = event.results[event.results.length - 1][0].transcript.toLowerCase();
-                if (
-                    texto.includes("paso") ||
-                    texto.includes("pita") ||
-                    texto.includes("cuidado") ||
-                    texto.includes("bocina") ||
-                    texto.includes("medio")
-                ) {
-                    sonarBocina();
-                }
-            };
-
-            recognition.onend = () => {
-                if (escuchando) {
-                    setTimeout(() => { try { recognition.start(); } catch (e) { } }, 300);
-                } else {
-                    btnMicro.innerText = "🎙️ Activar Escucha por Voz";
-                    btnMicro.classList.remove('activo');
-                }
-            };
-
-            btnMicro.addEventListener('click', () => {
-                getAudioContext();
-                if (!escuchando) {
-                    try { recognition.start(); } catch (e) { }
-                } else {
-                    escuchando = false;
-                    recognition.stop();
-                }
-            });
-        }
-    </script>
+    function pantallaNegra() {
+      document.body.classList.toggle('negro');
+    }
+  </script>
 </body>
-
 </html>
